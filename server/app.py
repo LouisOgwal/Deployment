@@ -5,7 +5,7 @@ from flask_restful import Api, Resource
 from models import db, bcrypt, User, Product, Store, StoreProduct
 from config import Config
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv  
 load_dotenv()
 
 app = Flask(__name__)
