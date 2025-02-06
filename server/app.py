@@ -4,11 +4,14 @@ from flask_cors import CORS
 from flask_restful import Api, Resource
 from models import db, bcrypt, User, Product, Store, StoreProduct
 from config import Config
+import os
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
 
 db.init_app(app)
 bcrypt.init_app(app)
@@ -19,7 +22,6 @@ api = Api(app)
 @app.route('/')
 def index():
     return '<h1>Project Server Running</h1>'
-
 
 class ProductListResource(Resource):
     def get(self):
@@ -47,7 +49,6 @@ class ProductResource(Resource):
         db.session.commit()
         return jsonify({"message": "Product deleted"}), 200
 
-
 class StoreListResource(Resource):
     def get(self):
         stores = Store.query.all()
@@ -74,7 +75,6 @@ class StoreResource(Resource):
         db.session.commit()
         return jsonify({"message": "Store deleted"}), 200
 
-
 class StoreProductResource(Resource):
     def post(self):
         try:
@@ -88,7 +88,6 @@ class StoreProductResource(Resource):
             return jsonify({"id": store_product.id, "price": store_product.price, "product_id": store_product.product_id, "store_id": store_product.store_id}), 201
         except Exception as e:
             return jsonify({"error": str(e)}), 500
-
 
 api.add_resource(ProductListResource, "/products")
 api.add_resource(ProductResource, "/products/<int:product_id>")
