@@ -6,15 +6,15 @@ name = "pypi"
 [packages]
 ipdb = "0.13.9"
 Werkzeug = "2.2.2"
-sqlalchemy-serializer = "*"
 flask = "*"
 flask-migrate = "*"
 flask-cors = "*"
-flask-bcrypt = "*"
 flask-restful = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
 python-dotenv = "*"
+sqlalchemy-serializer = "*"
+flask-bcrypt = "*"
 
 [requires]
 python_full_version = "3.8.13"
