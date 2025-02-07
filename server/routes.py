@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from .models import Product, User, Category  # Import your models
-from .database import db  # Assuming you have a database instance
+from server.database import db  # Assuming you have a database instance
 
 api = Blueprint('api', __name__)
 
