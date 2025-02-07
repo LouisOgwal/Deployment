@@ -6,6 +6,7 @@ from models import db, bcrypt, User, Product, Store, StoreProduct
 from config import Config
 import os
 from dotenv import load_dotenv  
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -14,7 +15,7 @@ app.config.from_object(Config)
 db.init_app(app)
 bcrypt.init_app(app)
 migrate = Migrate(app, db)
-CORS(app, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 api = Api(app)
 
 @app.route('/')
@@ -30,7 +31,7 @@ class ProductListResource(Resource):
         try:
             data = request.get_json()
             if not data.get("name"):
-                abort(400, "Product name is required")
+                return jsonify({"error": "Product name is required"}), 400
             product = Product(name=data["name"], description=data.get("description", ""))
             db.session.add(product)
             db.session.commit()
@@ -42,7 +43,7 @@ class ProductResource(Resource):
     def delete(self, product_id):
         product = Product.query.get(product_id)
         if not product:
-            abort(404, "Product not found")
+            return jsonify({"error": "Product not found"}), 404
         db.session.delete(product)
         db.session.commit()
         return jsonify({"message": "Product deleted"}), 200
@@ -56,7 +57,7 @@ class StoreListResource(Resource):
         try:
             data = request.get_json()
             if not data.get("name") or not data.get("address"):
-                abort(400, "Store name and address are required")
+                return jsonify({"error": "Store name and address are required"}), 400
             store = Store(name=data["name"], address=data["address"])
             db.session.add(store)
             db.session.commit()
@@ -68,7 +69,7 @@ class StoreResource(Resource):
     def delete(self, store_id):
         store = Store.query.get(store_id)
         if not store:
-            abort(404, "Store not found")
+            return jsonify({"error": "Store not found"}), 404
         db.session.delete(store)
         db.session.commit()
         return jsonify({"message": "Store deleted"}), 200
@@ -78,7 +79,7 @@ class StoreProductResource(Resource):
         try:
             data = request.get_json()
             if not all(k in data for k in ("price", "product_id", "store_id")):
-                abort(400, "Missing required fields: price, product_id, store_id")
+                return jsonify({"error": "Missing required fields: price, product_id, store_id"}), 400
 
             store_product = StoreProduct(price=data["price"], product_id=data["product_id"], store_id=data["store_id"])
             db.session.add(store_product)
@@ -94,4 +95,7 @@ api.add_resource(StoreResource, "/stores/<int:store_id>")
 api.add_resource(StoreProductResource, "/store_products")
 
 if __name__ == "__main__":
-    app.run(port=5555, debug=True)
+    port = int(os.environ.get("PORT", 5555))
+    with app.app_context():
+        db.create_all()
+    app.run(host="0.0.0.0", port=port, debug=False)  # Ensure proper hosting
