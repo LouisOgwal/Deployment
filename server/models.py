@@ -7,6 +7,12 @@ from sqlalchemy.ext.associationproxy import association_proxy
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False, unique=True)
+
 class User(db.Model, SerializerMixin):
     __tablename__ = "users"
 
@@ -31,6 +37,10 @@ class Product(db.Model, SerializerMixin):
 
     store_products = db.relationship("StoreProduct", back_populates="product", cascade="all, delete-orphan")
     stores = association_proxy("store_products", "store")
+
+    # Add a Foreign Key to Category
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    category = db.relationship('Category', backref=db.backref('products', lazy=True))
 
 class Store(db.Model, SerializerMixin):
     __tablename__ = "stores"
